@@ -1,0 +1,111 @@
+###############################################################################
+# Fancy prompt-setting logic.
+#
+# To use add the following to your .bashrc (Linux) or .bash_profile (Mac):
+#
+# source $REPO/bash_ps1
+#
+# ...where $REPO is the path of this cloned repository
+###############################################################################
+
+# Default branch and command status characters.
+#
+if [ ! -n "${PS1_FILES_TO_BE_PUSHED}" ]; then
+    PS1_FILES_TO_BE_PUSHED="🙌"
+fi
+
+if [ ! -n "${PS1_FILES_UNTRACKED}" ]; then
+    PS1_FILES_UNTRACKED="🔥"
+fi
+
+if [ ! -n "${PS1_FILES_CHANGED}" ]; then
+    PS1_FILES_CHANGED="⛔"
+fi
+
+if [ ! -n "${PS1_FILES_TO_BE_COMMITTED}" ]; then
+    PS1_FILES_TO_BE_COMMITTED="✅"
+fi
+
+if [ ! -n "${PS1_STATUS_OK}" ]; then
+    PS1_STATUS_OK="😎"
+fi
+
+if [ ! -n "${PS1_STATUS_ERR}" ]; then
+    PS1_STATUS_ERR="😡"
+fi
+
+if [ ! -n "${PS1_BASE}" ]; then
+    PS1_BASE="\u@\h"
+fi
+
+
+# ANSI color codes. For teh pretteh.
+#
+BOLD='\e[1m'
+RED='\e[1;31m'
+GREEN='\e[1;32m'
+YELLOW='\e[1;33m'
+BLUE='\e[1;34m'
+NC='\e[0m' # No Color
+
+
+# If we're in a Git repo, add the name of the current branch.
+# Will always return the value of the command that precedes it.
+#
+__branch() {
+    STATUS=$?
+
+    BRANCH=$(git branch 2>&1 | grep '*' | sed 's/\* //g')
+    OUTPUT=""
+
+    if [ "master" = "$BRANCH" ]; then
+        OUTPUT="MASTER"
+    elif [ -n "$BRANCH" ]; then
+        OUTPUT="$BRANCH"
+    fi
+
+    if [ -n "$BRANCH" ]; then
+        GIT_STATUS=$(git status)
+
+        if [ -n "$(echo "$GIT_STATUS" | grep 'branch is ahead of ')" ]; then
+            OUTPUT="${OUTPUT}${PS1_FILES_TO_BE_PUSHED}"
+        fi
+
+        if [ -n "$(echo "$GIT_STATUS" | grep 'Untracked files')" ]; then
+            OUTPUT="${OUTPUT}${PS1_FILES_UNTRACKED}"
+        fi
+
+        if [ -n "$(echo "$GIT_STATUS" | grep 'Changes not staged for commit')" ]; then
+            OUTPUT="${OUTPUT}${PS1_FILES_CHANGED}"
+        fi
+
+        if [ -n "$(echo "$GIT_STATUS" | grep 'Changes to be committed')" ]; then
+            OUTPUT="${OUTPUT}${PS1_FILES_TO_BE_COMMITTED}"
+        fi
+
+        echo -e "[$OUTPUT]"
+    fi
+
+    return ${STATUS}
+}
+
+
+# Returns the $PS1_STATUS_* value appropriate for the status code of the
+# previous command.
+#
+__status() {
+    STATUS=$?
+
+    if [[ $STATUS -eq 0 ]]; then
+        echo "${PS1_STATUS_OK}"
+    else
+        echo "${PS1_STATUS_ERR}"
+    fi
+
+    return ${STATUS}
+}
+
+# Previous version. I might still want to keep this.
+# export PS1="${GREEN}${PS1_BASE}${NC}\`__status\`:\[${BLUE}\]\w${RED}\`__branch\`\[${NC}\]\$ "
+
+export PS1="\[${BLUE}\]\w${RED}\`__branch\`\n\`__status\` \[${NC}\]\$ "
