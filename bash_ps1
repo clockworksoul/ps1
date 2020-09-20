@@ -55,7 +55,7 @@ NC='\e[0m' # No Color
 __branch() {
     STATUS=$?
 
-    BRANCH=$(git branch 2>&1 | grep '*' | sed 's/\* //g')
+    BRANCH=$(git branch 2>&1 | /usr/bin/grep '*' | sed 's/\* //g')
     OUTPUT=""
 
     if [ "master" = "$BRANCH" ]; then
@@ -67,19 +67,19 @@ __branch() {
     if [ -n "$BRANCH" ]; then
         GIT_STATUS=$(git status)
 
-        if [ -n "$(echo "$GIT_STATUS" | grep 'branch is ahead of ')" ]; then
+        if [ -n "$(echo "$GIT_STATUS" | /usr/bin/grep 'branch is ahead of ')" ]; then
             OUTPUT="${OUTPUT}${PS1_FILES_TO_BE_PUSHED}"
         fi
 
-        if [ -n "$(echo "$GIT_STATUS" | grep 'Untracked files')" ]; then
+        if [ -n "$(echo "$GIT_STATUS" | /usr/bin/grep 'Untracked files')" ]; then
             OUTPUT="${OUTPUT}${PS1_FILES_UNTRACKED}"
         fi
 
-        if [ -n "$(echo "$GIT_STATUS" | grep 'Changes not staged for commit')" ]; then
+        if [ -n "$(echo "$GIT_STATUS" | /usr/bin/grep 'Changes not staged for commit')" ]; then
             OUTPUT="${OUTPUT}${PS1_FILES_CHANGED}"
         fi
 
-        if [ -n "$(echo "$GIT_STATUS" | grep 'Changes to be committed')" ]; then
+        if [ -n "$(echo "$GIT_STATUS" | /usr/bin/grep 'Changes to be committed')" ]; then
             OUTPUT="${OUTPUT}${PS1_FILES_TO_BE_COMMITTED}"
         fi
 
