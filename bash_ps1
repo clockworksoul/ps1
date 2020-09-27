@@ -60,6 +60,8 @@ __branch() {
 
     if [ "master" = "$BRANCH" ]; then
         OUTPUT="MASTER"
+    elif [ "main" = "$BRANCH" ]; then
+        OUTPUT="MAIN"
     elif [ -n "$BRANCH" ]; then
         OUTPUT="$BRANCH"
     fi
