@@ -52,7 +52,7 @@ NC='\e[0m' # No Color
 # If we're in a Git repo, add the name of the current branch.
 # Will always return the value of the command that precedes it.
 #
-__branch() {
+function __branch() {
     STATUS=$?
 
     BRANCH=$(git branch 2>&1 | /usr/bin/grep '*' | sed 's/\* //g')
@@ -95,7 +95,7 @@ __branch() {
 # Returns the $PS1_STATUS_* value appropriate for the status code of the
 # previous command.
 #
-__status() {
+function __status() {
     STATUS=$?
 
     if [[ $STATUS -eq 0 ]]; then
